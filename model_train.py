@@ -108,5 +108,5 @@ model.fit(train_data, train_labels_oh, epochs = 7, batch_size = 256)
 # In[16]:
 
 
-model.save(filepath = 'saved_models/model.h5')
+model.save(filepath = 'saved_models/model1.h5')
 

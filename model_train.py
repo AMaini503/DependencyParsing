@@ -4,10 +4,10 @@ from aux import replaceUsingIndex, getIndexFromFile, LoadNewTrainFile
 
 
 # create indices from vocab files
-index_of_words = getIndexFromFile(filename = 'nlp_hw_dep/data/vocabs.word')
-index_of_labels = getIndexFromFile(filename = 'nlp_hw_dep/data/vocabs.labels')
-index_of_pos = getIndexFromFile(filename = 'nlp_hw_dep/data/vocabs.pos')
-index_of_actions = getIndexFromFile(filename = 'nlp_hw_dep/data/vocabs.actions')
+index_of_words = getIndexFromFile(filename = 'data/vocabs.word')
+index_of_labels = getIndexFromFile(filename = 'data/vocabs.labels')
+index_of_pos = getIndexFromFile(filename = 'data/vocabs.pos')
+index_of_actions = getIndexFromFile(filename = 'data/vocabs.actions')
 
 
 n_words = len(index_of_words)
@@ -16,16 +16,16 @@ n_labels = len(index_of_labels)
 n_actions = len(index_of_actions)
 
 
-new_train_file = 'nlp_hw_dep/data/train_with_indices.data'
+new_train_file = 'data/train_with_indices.data'
 
 # Create temporary training file
-replaceUsingIndex(oldfilename = 'nlp_hw_dep/data/train.data', newfilename = new_train_file, 
+replaceUsingIndex(oldfilename = 'data/train.data', newfilename = new_train_file, 
                   indices = [index_of_words, index_of_pos, index_of_labels, index_of_actions])
 
 
 
 # Load feature matrix and target labels from the new training file
-train_data, train_labels = LoadNewTrainFile(filename = 'nlp_hw_dep/data/train_with_indices.data')
+train_data, train_labels = LoadNewTrainFile(filename = 'data/train_with_indices.data')
 
 from keras.models import Model
 from keras.layers import Dense, Input, Embedding, Reshape, Concatenate, Lambda

@@ -1,5 +1,8 @@
 import os,sys
 from decoder import *
+from aux import getIndexFromFile 
+from keras.models import load_model
+
 
 class DepModel:
     def __init__(self):
@@ -9,10 +12,19 @@ class DepModel:
             actions: provides indices for actions.
             it has the same order as the data/vocabs.actions file.
         '''
-        # if you prefer to have your own index for actions, change this.
-        self.actions = ['SHIFT', 'LEFT-ARC:rroot', 'LEFT-ARC:cc', 'LEFT-ARC:number', 'LEFT-ARC:ccomp', 'LEFT-ARC:possessive', 'LEFT-ARC:prt', 'LEFT-ARC:num', 'LEFT-ARC:nsubjpass', 'LEFT-ARC:csubj', 'LEFT-ARC:conj', 'LEFT-ARC:dobj', 'LEFT-ARC:nn', 'LEFT-ARC:neg', 'LEFT-ARC:discourse', 'LEFT-ARC:mark', 'LEFT-ARC:auxpass', 'LEFT-ARC:infmod', 'LEFT-ARC:mwe', 'LEFT-ARC:advcl', 'LEFT-ARC:aux', 'LEFT-ARC:prep', 'LEFT-ARC:parataxis', 'LEFT-ARC:nsubj', 'LEFT-ARC:<null>', 'LEFT-ARC:rcmod', 'LEFT-ARC:advmod', 'LEFT-ARC:punct', 'LEFT-ARC:quantmod', 'LEFT-ARC:tmod', 'LEFT-ARC:acomp', 'LEFT-ARC:pcomp', 'LEFT-ARC:poss', 'LEFT-ARC:npadvmod', 'LEFT-ARC:xcomp', 'LEFT-ARC:cop', 'LEFT-ARC:partmod', 'LEFT-ARC:dep', 'LEFT-ARC:appos', 'LEFT-ARC:det', 'LEFT-ARC:amod', 'LEFT-ARC:pobj', 'LEFT-ARC:iobj', 'LEFT-ARC:expl', 'LEFT-ARC:predet', 'LEFT-ARC:preconj', 'LEFT-ARC:root', 'RIGHT-ARC:rroot', 'RIGHT-ARC:cc', 'RIGHT-ARC:number', 'RIGHT-ARC:ccomp', 'RIGHT-ARC:possessive', 'RIGHT-ARC:prt', 'RIGHT-ARC:num', 'RIGHT-ARC:nsubjpass', 'RIGHT-ARC:csubj', 'RIGHT-ARC:conj', 'RIGHT-ARC:dobj', 'RIGHT-ARC:nn', 'RIGHT-ARC:neg', 'RIGHT-ARC:discourse', 'RIGHT-ARC:mark', 'RIGHT-ARC:auxpass', 'RIGHT-ARC:infmod', 'RIGHT-ARC:mwe', 'RIGHT-ARC:advcl', 'RIGHT-ARC:aux', 'RIGHT-ARC:prep', 'RIGHT-ARC:parataxis', 'RIGHT-ARC:nsubj', 'RIGHT-ARC:<null>', 'RIGHT-ARC:rcmod', 'RIGHT-ARC:advmod', 'RIGHT-ARC:punct', 'RIGHT-ARC:quantmod', 'RIGHT-ARC:tmod', 'RIGHT-ARC:acomp', 'RIGHT-ARC:pcomp', 'RIGHT-ARC:poss', 'RIGHT-ARC:npadvmod', 'RIGHT-ARC:xcomp', 'RIGHT-ARC:cop', 'RIGHT-ARC:partmod', 'RIGHT-ARC:dep', 'RIGHT-ARC:appos', 'RIGHT-ARC:det', 'RIGHT-ARC:amod', 'RIGHT-ARC:pobj', 'RIGHT-ARC:iobj', 'RIGHT-ARC:expl', 'RIGHT-ARC:predet', 'RIGHT-ARC:preconj', 'RIGHT-ARC:root']
-        # write your code here for additional parameters.
-        # feel free to add more arguments to the initializer.
+    
+        # Load the indices from vocab files
+        self.index_of_words = getIndexFromFile(filename = 'data/vocabs.word')
+        self.index_of_pos = getIndexFromFile(filename = 'data/vocabs.pos')
+        self.index_of_labels = getIndexFromFile(filename = 'data/vocabs.labels')
+        self.index_of_actions = getIndexFromFile(filename = 'data/vocabs.actions')
+        
+        # Need to sort this to keep the same mapping between integer to label
+        sorted_actions = sorted(list(self.index_of_actions.keys()), key = lambda x: x[1]) 
+        self.actions = list(sorted_actions)
+        
+        # Load trained model here 
+        self.model = load_model('saved_models/model.h5')
 
     def score(self, str_features):
         '''
@@ -21,8 +33,32 @@ class DepModel:
         DO NOT ADD ANY ARGUMENTS TO THIS FUNCTION.
         :return: list of scores
         '''
-        # change this part of the code.
-        return [0]*len(self.actions)
+        # transform this feature vector to vector of indices
+        words = str_features[0:20]
+        poss = str_features[20: 20 + 20]
+        labels = str_features[40: 40 + 12]
+        
+        new_feature_vector = []
+        for word in words:
+            if(word in self.index_of_words):
+                new_feature_vector.append(self.index_of_words[word])
+            else:
+                new_feature_vector.append(self.index_of_words['<unk>'])
+
+        for tag in poss:
+            if(tag in self.index_of_pos):
+                new_feature_vector.append(self.index_of_pos[tag])
+            else:
+                new_feature_vector.append(self.index_of_pos['<null>'])
+        
+        for label in labels:
+            new_feature_vector.append(self.index_of_labels[label])
+        
+        
+        return self.model.predict(
+            x = np.array([new_feature_vector]),
+            batch_size = 1
+        )[0]
 
 if __name__=='__main__':
     m = DepModel()

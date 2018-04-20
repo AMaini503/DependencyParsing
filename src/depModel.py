@@ -20,8 +20,10 @@ class DepModel:
         self.index_of_actions = getIndexFromFile(filename = 'data/vocabs.actions')
         
         # Need to sort this to keep the same mapping between integer to label
-        sorted_actions = sorted(list(self.index_of_actions.keys()), key = lambda x: x[1]) 
-        self.actions = list(sorted_actions)
+        index_of_actions_items = self.index_of_actions.items()
+        sorted_index_of_actions =  sorted(index_of_actions_items, key = lambda x: x[1])
+        sorted_actions = [x[0] for x in sorted_index_of_actions] 
+        self.actions = sorted_actions
         
         # Load trained model here 
         self.model = load_model('saved_models/model.h5')

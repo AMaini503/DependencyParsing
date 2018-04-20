@@ -5,13 +5,18 @@ from keras.models import load_model
 
 
 class DepModel:
-    def __init__(self):
+    def __init__(self, use_model = 1):
         '''
             You can add more arguments for examples actions and model paths.
             You need to load your model here.
             actions: provides indices for actions.
             it has the same order as the data/vocabs.actions file.
         '''
+
+        if(use_model == 1):
+            print("Using Model1 (200 hidden units)")
+        elif(use_model == 2):
+            print("Using Model2 (400 hidden units)")
     
         # Load the indices from vocab files
         self.index_of_words = getIndexFromFile(filename = 'data/vocabs.word')
@@ -26,7 +31,8 @@ class DepModel:
         self.actions = sorted_actions
         
         # Load trained model here 
-        self.model = load_model('saved_models/model.h5')
+        model_num = str(use_model)
+        self.model = load_model('saved_models/model' + str(model_num) + '.h5')
 
     def score(self, str_features):
         '''
@@ -63,7 +69,13 @@ class DepModel:
         )[0]
 
 if __name__=='__main__':
-    m = DepModel()
+    m = None
+    if(len(sys.argv) == 4):
+        # Use model2
+        m = DepModel(use_model_2 = True)
+    else:
+        m = DepModel()
+
     input_p = os.path.abspath(sys.argv[1])
     output_p = os.path.abspath(sys.argv[2])
     Decoder(m.score, m.actions).parse(input_p, output_p)

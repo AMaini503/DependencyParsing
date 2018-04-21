@@ -57,8 +57,6 @@ class DepModel:
         
         for label in labels:
             new_feature_vector.append(self.index_of_labels[label])
-        
-        
         return self.model.predict(
             x = np.array([new_feature_vector]),
             batch_size = 1

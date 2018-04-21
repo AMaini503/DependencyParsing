@@ -5,7 +5,7 @@ def getIndexFromFile(filename = None):
     with open(filename, 'r') as f:
         for line in f:
             token, ind = line.strip().split()
-            index[token] = ind
+            index[token] = int(ind)
     
     return index
 
@@ -35,20 +35,23 @@ def replaceUsingIndex(oldfilename = None, newfilename = None, indices = None):
             
             for word in words:
                 if(word in index_of_words):
-                    newline += index_of_words[word] + ' '
+                    newline += str(index_of_words[word]) + ' '
                 else:
-                    newline += index_of_words['<unk>'] + ' '
+                    newline += str(index_of_words['<unk>']) + ' '
                 
             for pos in poss:
-                newline += index_of_pos[pos] + ' '
+                if(pos in index_of_pos):
+                    newline += str(index_of_pos[pos]) + ' '
+                else:
+                    newline += str(index_of_pos['<null>'])
                 
             for label in labels:
-                newline += index_of_labels[label] + ' '
+                newline += str(index_of_labels[label]) + ' '
             
-            newline += index_of_actions[action] + '\n'
+            newline += str(index_of_actions[action]) + '\n'
             f_new.write(newline)
 
-def LoadNewTrainFile(filename = 'nlp_hw_dep/data/train_with_indices.data'):
+def LoadNewTrainFile(filename = 'data/train_with_indices.data'):
     """Returns the data in the new train file and returns them as feature matrix and target label"""
     train_data = []
     train_labels = []
@@ -63,3 +66,19 @@ def LoadNewTrainFile(filename = 'nlp_hw_dep/data/train_with_indices.data'):
             train_labels.append(action)
     
     return np.asarray(train_data), np.asarray(train_labels)
+
+def LoadTestFile(filename = 'data/dev_with_indices.data'):
+    """Returns the data in the new test file and returns them as feature matrix and target label"""
+    test_data = []
+    test_labels = []
+    with open(filename) as f:
+        for line in f:
+            tokens = line.strip().split()
+            tokens = [int(x) for x in tokens]
+            feature_vector = tokens[0:52]
+            action = tokens[52]
+            
+            test_data.append(feature_vector)
+            test_labels.append(action)
+    
+    return np.asarray(test_data), np.asarray(test_labels)

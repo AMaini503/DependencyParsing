@@ -5,7 +5,7 @@ from keras.models import load_model
 
 
 class DepModel:
-    def __init__(self, model_num = 1):
+    def __init__(self):
         '''
             You can add more arguments for examples actions and model paths.
             You need to load your model here.
@@ -13,7 +13,7 @@ class DepModel:
             it has the same order as the data/vocabs.actions file.
         '''
 
-        print("Using Model %d" % (model_num))
+        print("Using Model 1")
 
         # Load the indices from vocab files
         self.index_of_words = getIndexFromFile(filename = 'data/vocabs.word')
@@ -28,7 +28,7 @@ class DepModel:
         self.actions = sorted_actions
         
         # Load trained model here 
-        self.model = load_model('saved_models/model' + str(model_num) + '.h5')
+        self.model = load_model('saved_models/model1.h5')
 
     def score(self, str_features):
         '''
@@ -63,7 +63,7 @@ class DepModel:
         )[0]
 
 if __name__=='__main__':
-    m = DepModel(model_num = int(sys.argv[3]))
+    m = DepModel()
 
     input_p = os.path.abspath(sys.argv[1])
     output_p = os.path.abspath(sys.argv[2])
